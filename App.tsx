@@ -8,11 +8,14 @@ const App: React.FC = () => {
   const [authMode, setAuthMode] = useState<AuthMode>(AuthMode.LOGIN);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between items-center bg-[#fafafa]">
-      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-[350px] pt-8 md:pt-12 px-4">
-        <LoginCard mode={authMode} onToggleMode={() => setAuthMode(prev => prev === AuthMode.LOGIN ? AuthMode.SIGNUP : AuthMode.LOGIN)} />
+    <div className="min-h-screen flex flex-col justify-between items-center bg-white md:bg-[#fafafa]">
+      <main className="flex-grow flex flex-col items-center justify-center w-full max-w-[350px] pt-4 md:pt-12 px-0 md:px-4">
+        <LoginCard 
+          mode={authMode} 
+          onToggleMode={() => setAuthMode(prev => prev === AuthMode.LOGIN ? AuthMode.SIGNUP : AuthMode.LOGIN)} 
+        />
         
-        <div className="mt-4 flex flex-col items-center space-y-4">
+        <div className="hidden md:flex mt-4 flex-col items-center space-y-4">
           <p className="text-sm text-[#262626]">Get the app.</p>
           <div className="flex space-x-2">
             <a href="#" className="h-10">

@@ -96,9 +96,6 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
   const isLogin = mode === AuthMode.LOGIN;
   
-  // Dynamic API URL for deployment: 
-  // If we're on localhost:3000, we point to localhost:3001. 
-  // Otherwise, we assume the backend is hosted on the same domain as the frontend.
   const API_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:3001/api' 
     : '/api';
@@ -166,14 +163,9 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
   return (
     <div className="w-full flex flex-col space-y-2.5">
-      <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-8 px-10 flex flex-col items-center">
+      <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-8 px-6 md:px-10 flex flex-col items-center">
         <div className="mt-3 mb-8 flex flex-col items-center space-y-2">
-          <img 
-            src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
-            alt="Instagram Logo" 
-            className="w-16 h-16"
-          />
-          <div className="h-14 w-44 flex items-center justify-center">
+          <div className="h-12 md:h-14 w-40 md:w-44 flex items-center justify-center">
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png" 
               alt="Instagram" 
@@ -235,7 +227,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
             onChange={(v) => handleInputChange('password', v)}
           />
 
-          {error && <p className="text-red-500 text-sm text-center my-3 leading-tight">{error}</p>}
+          {error && <p className="text-red-500 text-[13px] text-center my-3 leading-tight">{error}</p>}
 
           <button
             type="submit"
