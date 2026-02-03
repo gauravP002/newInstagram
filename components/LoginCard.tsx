@@ -162,7 +162,8 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
   return (
     <div className="w-full flex flex-col space-y-2.5">
       <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-8 px-6 md:px-10 flex flex-col items-center">
-        <div className="mt-3 mb-8 flex flex-col items-center space-y-2">
+        {/* Main Logo Container (Header) */}
+        <div className="mt-3 mb-4 flex flex-col items-center space-y-6">
           <div className="h-12 md:h-14 w-44 md:w-48 flex items-center justify-center">
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png" 
@@ -170,9 +171,20 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
               className="h-full object-contain"
             />
           </div>
+          
+          {/* Instagram Glyph Logo Below Header/Wordmark */}
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2px] shadow-sm flex items-center justify-center">
+             <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
+                <img 
+                  src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
+                  alt="Instagram Glyph" 
+                  className="w-10 h-10"
+                />
+             </div>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch pt-2">
           {!isLogin && (
             <>
               <p className="text-[#8e8e8e] font-semibold text-center text-[17px] mb-4 leading-tight">
