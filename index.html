@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login • Instagram</title>
-    <!-- Tailwind Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use the built production CSS -->
+    <link rel="stylesheet" href="/dist/style.css">
     <link rel="icon" type="image/png" href="https://www.instagram.com/static/images/ico/favicon.ico/36b304827362.ico">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
@@ -28,7 +28,7 @@
 </head>
 <body class="bg-[#fafafa]">
     <div id="root"></div>
-    <!-- Load the bundled app. Removed type="module" to avoid strict MIME checks while debugging. -->
-    <script src="/dist/bundle.js"></script>
+    <!-- Load as a module to match the ESM build format -->
+    <script type="module" src="/dist/bundle.js"></script>
 </body>
 </html>
