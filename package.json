@@ -17,6 +17,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "mkdir -p dist && esbuild index.tsx --bundle --minify --outfile=dist/bundle.js --format=esm --loader:.tsx=tsx --loader:.ts=ts --define:process.env.NODE_ENV=\\\"production\\\""
+    "build": "mkdir -p dist && esbuild index.tsx --bundle --minify --outfile=dist/bundle.js --format=iife --global-name=App --loader:.tsx=tsx --loader:.ts=ts --define:process.env.NODE_ENV=\\\"production\\\""
   }
 }

