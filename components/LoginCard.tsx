@@ -52,7 +52,7 @@ const ValentineSurpriseView: React.FC = () => {
         </div>
 
         <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 via-pink-500 to-red-500 bg-clip-text text-transparent mb-4">
-          Happy Valentine's Day!
+          Happy Day!
         </h1>
         
         <div className="flex items-center space-x-2 mb-6">
@@ -66,7 +66,7 @@ const ValentineSurpriseView: React.FC = () => {
         </p>
         
         <p className="text-[#8e8e8e] text-[15px] leading-relaxed max-w-[300px] mb-10">
-          This isn't just a login page — it's a small reminder that you're appreciated. Wishing you a day filled with all the love you deserve!
+           It's a small reminder that you're appreciated. Wishing you a day filled with all the love you deserve!
         </p>
 
         <div className="flex flex-col space-y-4 w-full max-w-[240px]">
