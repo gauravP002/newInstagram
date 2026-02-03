@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AuthInput from './AuthInput';
 import { AuthMode } from '../types';
