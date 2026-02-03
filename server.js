@@ -3,6 +3,7 @@ const express = require('express');
 const { Client, Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -21,9 +22,20 @@ const dbConfig = {
 app.use(cors());
 app.use(express.json());
 
-// Serve the compiled frontend bundle
-app.use('/dist', express.static(path.join(__dirname, 'dist')));
-// Serve other static assets
+// Serve the compiled frontend bundle specifically
+const distPath = path.join(__dirname, 'dist');
+const bundlePath = path.join(distPath, 'bundle.js');
+
+// Log path info for debugging Render deployments
+console.log('Checking for bundle at:', bundlePath);
+if (fs.existsSync(bundlePath)) {
+    console.log('Bundle found successfully.');
+} else {
+    console.error('CRITICAL: bundle.js NOT found in dist folder! Ensure build command ran successfully.');
+}
+
+// Static middleware
+app.use('/dist', express.static(distPath));
 app.use(express.static(__dirname));
 
 async function initDb() {
@@ -32,7 +44,7 @@ async function initDb() {
     : new Pool(dbConfig);
 
   try {
-    // Local DB creation logic
+    // Local DB creation logic (only if no URL provided)
     if (!process.env.DATABASE_URL) {
         const baseClient = new Client({ ...dbConfig, database: 'postgres' });
         await baseClient.connect();

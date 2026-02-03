@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login • Instagram</title>
+    <!-- Using official Tailwind Play CDN for development, or usually built CSS for production -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="https://www.instagram.com/static/images/ico/favicon.ico/36b304827362.ico">
     <style>
@@ -27,7 +28,7 @@
 </head>
 <body class="bg-[#fafafa]">
     <div id="root"></div>
-    <!-- The bundled app code -->
-    <script src="/dist/bundle.js"></script>
+    <!-- Load the bundled app as a module to match esbuild --format=esm -->
+    <script type="module" src="/dist/bundle.js"></script>
 </body>
 </html>
